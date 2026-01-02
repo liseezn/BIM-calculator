@@ -49,7 +49,7 @@
 
 - **国家卫生健康委员会官网**：https://www.nhc.gov.cn
 - **国家标准信息平台**：http://www.std.gov.cn
-- **卫生行业标准查询**：https://www.nhc.gov.cn/wjw/yingyang/
+- **国家卫生健康委**：https://www.nhc.gov.cn
 
 ### 📊 标准更新记录
 
@@ -188,7 +188,6 @@ bmi-calculator/
 ## 🌍 国际化
 
 欢迎提交翻译版本：
-- 英文版
 - 其他语言版本
 
 ---
