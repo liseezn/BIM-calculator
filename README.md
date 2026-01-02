@@ -1,11 +1,11 @@
 # BIM-calculator
 一个基于国家卫健委《体重管理指导原则（2024年版）》的BMI+体脂率综合计算器，支持全年龄段人群评估。
-# 国家卫健委标准 BMI+体脂率 综合计算器（2024开源版）
+# liseeze BMI+体脂率 综合计算器
 
 [![GitHub license](https://img.shields.io/badge/license-LGPL--3.0-blue.svg)](https://github.com/your-username/bmi-calculator/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/your-username/bmi-calculator)](https://github.com/your-username/bmi-calculator/stargazers)
 
-一个基于国家卫健委《体重管理指导原则（2024年版）》的BMI+体脂率综合计算器，支持全年龄段（0-100岁+）人群评估。
+体重管理指导原则（2024年版）》的BMI+体脂率综合计算器，支持全年龄段人群评估。
 ## 📖 数据来源
 
 本计算器依据以下国家卫健委官方标准开发，所有标准均可通过官方链接查看：
