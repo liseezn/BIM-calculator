@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>liseezn BMI+体脂率 综合计算器</title>
+    <!-- LGPL开源许可证声明 -->
+    <meta name="license" content="LGPL">
+    <style>
+        /* 响应式样式优化：适配移动端+桌面端 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            max-width: 1000px;
+            margin: 15px auto;
+            padding: 15px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            border-radius: 8px;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+        h2 {
+            color: #2c3e50;
+            text-align: center;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        h3 {
+            color: #2c3e50;
+            margin-top: 25px;
+            margin-bottom: 12px;
+            border-left: 4px solid #27ae60;
+            padding-left: 10px;
+            font-size: 16px;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+            color: #34495e;
+            font-size: 15px;
+        }
+        input {
+            width: 100%;
+            padding: 9px;
+            box-sizing: border-box;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 15px;
+        }
+        .unit-switch {
+            display: flex;
+            gap: 12px;
+            margin-top: 6px;
+            flex-wrap: wrap;
+        }
+        .unit-switch label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: normal;
+            cursor: pointer;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+        button {
+            width: 100%;
+            padding: 11px;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0 20px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #219653;
+        }
+        .result {
+            margin: 20px 0;
+            padding: 12px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            border-radius: 4px;
+        }
+        .result p {
+            margin: 6px 0;
+            font-size: 15px;
+            color: #2c3e50;
+        }
+        .result p span {
+            font-weight: bold;
+            color: #27ae60;
+        }
+        .result .warning {
+            color: #e74c3c;
+        }
+        /* 表格响应式优化：移动端横向滚动 */
+        .official-table {
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+        .official-table table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            min-width: 600px;
+        }
+        .official-table th, .official-table td {
+            border: 1px solid #bdc3c7;
+            padding: 8px;
+            font-size: 13px;
+        }
+        .official-table th {
+            background-color: #ecf0f1;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .table-caption {
+            font-weight: bold;
+            font-size: 15px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            text-align: center;
+        }
+        .group-tag {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 11px;
+            color: white;
+            margin-right: 4px;
+        }
+        .adult {
+            background-color: #3498db;
+        }
+        .child {
+            background-color: #e67e22;
+        }
+        .elderly {
+            background-color: #9b59b6;
+        }
+        .pregnant {
+            background-color: #e74c3c;
+        }
+        .info-box, .disclaimer, .deploy-guide {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 20px 0;
+            border-left: 4px solid #f39c12;
+        }
+        .info-box h3, .disclaimer h3, .deploy-guide h3 {
+            border-left: none;
+            padding-left: 0;
+            color: #d35400;
+            margin-top: 0;
+        }
+        .source-link {
+            color: #3498db;
+            text-decoration: none;
+        }
+        .source-link:hover {
+            text-decoration: underline;
+        }
+        .disclaimer, .deploy-guide {
+            font-size: 14px;
+        }
+        .disclaimer ul, .deploy-guide ul {
+            padding-left: 20px;
+        }
+        .disclaimer li, .deploy-guide li {
+            margin-bottom: 6px;
+        }
+        .note {
+            background-color: #e8f4fc;
+            padding: 12px;
+            border-radius: 5px;
+            margin: 12px 0;
+            font-size: 13px;
+            color: #2c3e50;
+        }
+        /* 开源标识样式 */
+        .open-source {
+            text-align: center;
+            margin: 15px 0;
+            color: #7f8c8d;
+            font-size: 13px;
+        }
+        /* 隐藏超长表格的默认滚动提示，保持页面整洁 */
+        .long-table {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .result-box {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            border-left: 4px solid #3498db;
+        }
+        .result-box h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        /* 分享链接样式 */
+        .share-link {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0f7ff;
+            border-radius: 6px;
+            border: 1px solid #3498db;
+        }
+        .share-link input {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            background-color: white;
+        }
+        .copy-btn {
+            width: auto;
+            padding: 8px 16px;
+            background-color: #3498db;
+            margin: 5px 0;
+        }
+        .copy-btn:hover {
+            background-color: #2980b9;
+        }
+        /* 返回计算器按钮 */
+        .back-btn {
+            display: block;
+            width: auto;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 20px auto;
+            text-align: center;
+            text-decoration: none;
+        }
+        .back-btn:hover {
+            background-color: #2980b9;
+        }
+        /* 隐藏元素 */
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- 输入表单部分（默认显示） -->
+    <div id="calculator-form">
+        <h2> liseezn BMI+体脂率 综合计算器</h2>
+        
+        <!-- 核心输入表单 -->
+        <div class="form-group">
+            <label for="birthDate">出生日期（精确到月龄计算）：</label>
+            <input type="date" id="birthDate" required>
+        </div>
+        <div class="form-group">
+            <label for="height">身高：</label>
+            <input type="number" id="height" step="0.1" min="50" max="250" required placeholder="如 175（厘米）或 1.75（米）">
+            <div class="unit-switch">
+                <label>
+                    <input type="radio" name="heightUnit" value="m" checked> 米(m)
+                </label>
+                <label>
+                    <input type="radio" name="heightUnit" value="cm"> 厘米(cm)
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="weight">体重：</label>
+            <input type="number" id="weight" step="0.1" min="10" max="200" required placeholder="如 65（千克）或 130（斤）">
+            <div class="unit-switch">
+                <label>
+                    <input type="radio" name="weightUnit" value="kg" checked> 千克(kg)
+                </label>
+                <label>
+                    <input type="radio" name="weightUnit" value="jin"> 斤
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="waistCircumference">腰围（用于中心型肥胖+体脂率计算，必填）：</label>
+            <input type="number" id="waistCircumference" step="0.1" min="50" max="150" required placeholder="如 85（单位：厘米）">
+            <div class="note">提示：测量时保持空腹，自然站立，腰围尺与肚脐平齐，松紧适度（不压迫皮肤）</div>
+        </div>
+        <div class="form-group">
+            <label for="gender">性别（儿童/体脂率计算需区分）：</label>
+            <div class="unit-switch">
+                <label>
+                    <input type="radio" name="gender" value="male" checked> 男
+                </label>
+                <label>
+                    <input type="radio" name="gender" value="female"> 女
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="specialGroup">特殊人群（可选）：</label>
+            <div class="unit-switch">
+                <label>
+                    <input type="radio" name="specialGroup" value="normal" checked> 普通人群
+                </label>
+                <label>
+                    <input type="radio" name="specialGroup" value="pregnant"> 孕妇（需填写孕前BMI）
+                </label>
+            </div>
+        </div>
+
+        <button onclick="calculateAll()">计算 BMI+体脂率+综合评估</button>
+        
+        <!-- 结果显示区域 -->
+        <div class="result" id="result">
+            <div class="result-box">
+                <h4>等待计算结果...</h4>
+                <p>请填写完整信息后点击计算按钮。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 结果页面（默认隐藏） -->
+    <div id="result-page" class="hidden">
+        <h2>BMI+体脂率 综合评估结果</h2>
+        <div id="result-content">
+            <!-- 结果将通过JavaScript动态填充 -->
+        </div>
+        <button class="back-btn" onclick="goBackToCalculator()">返回计算器</button>
+    </div>
+
+    <!-- 资料来源 -->
+    <div class="info-box">
+        <h3>资料来源</h3>
+        <p>本计算器参考以下文件标准和指南：</p>
+        <ul>
+            <li><a href="https://www.nhc.gov.cn/ylyjs/zcwj/202412/75cb79c171c94def9e768193e65484f7.shtml" class="source-link" target="_blank">《体重管理指导原则(2024年版)》</a></li>
+            <li><a href="https://www.nhc.gov.cn/wjw/yingyang/201308/a233d450fdbc47c5ad4f08b7e394d1e8.shtml" class="source-link" target="_blank">《成人体重判定》（WS/T 428-2013）</a></li>
+            <li><a href="https://www.nhc.gov.cn/wjw/pqt/201803/a7962d1ac01647b9837110bfd2d69b26.shtml" class="source-link" target="_blank">《学龄儿童青少年超重与肥胖筛查》（WS/T 586-2018）</a></li>
+            <li><a href="https://www.nhc.gov.cn/wjw/c100311/202211/923e7646561d4b88b72da9097d4da4d5.shtml" class="source-link" target="_blank">《7岁以下儿童生长标准》（WS/T 423-2022）</a></li>
+            <li><a href="https://www.nhc.gov.cn/wjw/c100311/202208/deb61e5c2299451ea1b957b0672272b3.shtml" class="source-link" target="_blank">《妊娠期妇女体重增长推荐值标准》（WS/T 801-2022）</a></li>
+            <li><a href="https://www.sport.gov.cn/n315/n20001395/c25880704/content.html" class="source-link" target="_blank">《国民体质测定标准（2023年修订）》</a></li>
+            <li><a href="https://pht.lzu.edu.cn/info/1005/1130.htm" class="source-link" target="_blank">《中国居民膳食指南（2022）》</a></li>
+        </ul>
+    </div>
+
+    <!-- 免责声明 -->
+    <div class="disclaimer">
+        <h3>免责声明</h3>
+        <p>本计算器仅作为健康参考工具，不能替代专业医疗建议：</p>
+        <ul>
+            <li>计算结果（含BMI、体脂率）仅供参考，不能作为医学诊断依据</li>
+            <li>特殊人群（孕妇、儿童、老年人、慢性病患者）应在医生指导下进行健康管理</li>
+            <li>个体健康状况受多种因素影响，BMI+体脂率仅为核心参考指标</li>
+            <li>如对计算结果有疑问或需要个性化建议，请咨询专业医疗人员</li>
+            <li>本工具依据国家卫健委标准开发，但可能无法涵盖所有个体差异</li>
+        </ul>
+    </div>
+
+    <!-- 部署说明 -->
+    <div class="deploy-guide">
+        <h3>开源部署说明</h3>
+        <ul>
+            <li>无需依赖任何后端服务，直接下载HTML文件即可在浏览器中打开使用</li>
+            <li>支持桌面端（Chrome、Edge、Firefox等主流浏览器）和移动端浏览器</li>
+            <li>可自由修改代码（遵循GNU General Public License v3.0许可证），如需二次开发建议保留原数据来源标注</li>
+            <li>核心算法说明：BMI=体重(kg)/身高(m)²；体脂率基于性别、年龄、BMI、腰围多维度计算</li>
+        </ul>
+    </div>
+
+    <!-- 核心标准表格（所有数据均在HTML中，JS仅查询运算） -->
+    <!-- 1. 中国成人BMI判定标准（依据PDF附表1） -->
+    <div class="official-table">
+        <div class="table-caption">表1：中国成人（18岁及以上）BMI判定标准 <span class="group-tag adult">普通成人</span></div>
+        <table>
+            <thead>
+                <tr>
+                    <th>类别</th>
+                    <th>BMI 范围（kg/m²）</th>
+                    <th>健康风险提示</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>体重过低</td><td>&lt; 18.5</td><td>可能增加营养不良、骨质疏松、免疫力低下风险</td></tr>
+                <tr><td>体重正常</td><td>18.5 ~ 23.9</td><td>健康风险较低，建议维持健康生活方式</td></tr>
+                <tr><td>超重</td><td>24.0 ~ 27.9</td><td>需控制饮食、增加运动，预防肥胖相关疾病</td></tr>
+                <tr><td>肥胖</td><td>≥ 28.0</td><td>高风险，需医学评估，制定综合干预方案</td></tr>
+            </tbody>
+        </table>
+        <div class="note">
+            <strong>依据：</strong>《成人体重判定》（WS/T 428-2013），引自《体重管理指导原则（2024年版）》附表1
+        </div>
+    </div>
+
+    <!-- 2. 中心型肥胖分类标准（依据PDF附表2） -->
+    <div class="official-table">
+        <div class="table-caption">表2：成人中心型肥胖分类（腰围判定） <span class="group-tag adult">普通成人</span></div>
+        <table>
+            <thead>
+                <tr>
+                    <th>分类</th>
+                    <th>男性腰围（cm）</th>
+                    <th>女性腰围（cm）</th>
+                    <th>健康风险提示</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>中心型肥胖前期</td><td>85 ≤ 腰围 &lt; 90</td><td>80 ≤ 腰围 &lt; 85</td><td>内脏脂肪开始堆积，需关注并改善生活方式</td></tr>
+                <tr><td>中心型肥胖</td><td>腰围 ≥ 90</td><td>腰围 ≥ 85</td><td>内脏脂肪超标，高代谢疾病风险显著升高，建议医学评估</td></tr>
+            </tbody>
+        </table>
+        <div class="note">
+            <strong>依据：</strong>《成人体重判定》（WS/T 428-2013），引自《体重管理指导原则（2024年版）》附表2
+        </div>
+    </div>
+
+    <!-- 3. 7岁以下儿童营养状况判定标准（依据PDF附表3） -->
+    <div class="official-table">
+        <div class="table-caption">表3：7岁以下儿童年龄别BMI的标准差法评价营养状况 <span class="group-tag child">7岁以下儿童</span></div>
+        <table>
+            <thead>
+                <tr>
+                    <th>年龄别BMI</th>
+                    <th>营养状况</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>≥+3 SD</td><td>重度肥胖</td></tr>
+                <tr><td>+2 SD ≤ BMI &lt; +3 SD</td><td>肥胖</td></tr>
+                <tr><td>+1 SD ≤ BMI &lt; +2 SD</td><td>超重</td></tr>
+                <tr><td>-1 SD ≤ BMI &lt; +1 SD</td><td>正常</td></tr>
+                <tr><td>-2 SD ≤ BMI &lt; -1 SD</td><td>偏瘦</td></tr>
+                <tr><td>-3 SD ≤ BMI &lt; -2 SD</td><td>消瘦</td></tr>
+                <tr><td>&lt; -3 SD</td><td>重度消瘦</td></tr>
+            </tbody>
+        </table>
+        <div class="note">
+            <strong>依据：</strong>《7岁以下儿童生长标准》（WS/T 423-2022），引自《体重管理指导原则（2024年版）》附表3
+        </div>
+    </div>
+
+    <!-- 4. 7岁以下男童月龄别BMI标准差表（依据PDF附表4） -->
+    <div class="official-table long-table">
+        <div class="table-caption">表4：7岁以下男童年龄别BMI的标准差数值（kg/m²） <span class="group-tag child">7岁以下男童</span></div>
+        <table id="boyBmiSdTable">
+            <thead>
+                <tr>
+                    <th>年龄</th>
+                    <th>-3 SD</th>
+                    <th>-2 SD</th>
+                    <th>-1 SD</th>
+                    <th>中位数</th>
+                    <th>+1 SD</th>
+                    <th>+2 SD</th>
+                    <th>+3 SD</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>0月</td><td>10.2</td><td>11.1</td><td>12.1</td><td>13.2</td><td>14.4</td><td>15.7</td><td>17.1</td></tr>
+                <tr><td>1月</td><td>11.8</td><td>12.9</td><td>14.0</td><td>15.1</td><td>16.4</td><td>17.7</td><td>19.2</td></tr>
+                <tr><td>2月</td><td>13.1</td><td>14.2</td><td>15.4</td><td>16.7</td><td>18.1</td><td>19.7</td><td>21.4</td></tr>
+                <tr><td>3月</td><td>13.6</td><td>14.8</td><td>16.0</td><td>17.4</td><td>19.0</td><td>20.8</td><td>22.7</td></tr>
+                <tr><td>4月</td><td>13.9</td><td>15.0</td><td>16.3</td><td>17.8</td><td>19.4</td><td>21.2</td><td>23.3</td></tr>
+                <tr><td>5月</td><td>14.0</td><td>15.1</td><td>16.4</td><td>17.9</td><td>19.5</td><td>21.4</td><td>23.5</td></tr>
+                <tr><td>6月</td><td>14.1</td><td>15.2</td><td>16.4</td><td>17.9</td><td>19.5</td><td>21.4</td><td>23.5</td></tr>
+                <tr><td>7月</td><td>14.1</td><td>15.2</td><td>16.4</td><td>17.8</td><td>19.4</td><td>21.3</td><td>23.4</td></tr>
+                <tr><td>8月</td><td>14.1</td><td>15.1</td><td>16.3</td><td>17.7</td><td>19.3</td><td>21.1</td><td>23.2</td></tr>
+                <tr><td>9月</td><td>14.0</td><td>15.1</td><td>16.2</td><td>17.6</td><td>19.1</td><td>20.9</td><td>23.0</td></tr>
+                <tr><td>10月</td><td>14.0</td><td>15.0</td><td>16.1</td><td>17.5</td><td>19.0</td><td>20.7</td><td>22.8</td></tr>
+                <tr><td>11月</td><td>13.9</td><td>14.9</td><td>16.0</td><td>17.3</td><td>18.8</td><td>20.5</td><td>22.6</td></tr>
+                <tr><td>1岁</td><td>13.8</td><td>14.8</td><td>15.9</td><td>17.1</td><td>18.6</td><td>20.3</td><td>22.3</td></tr>
+                <tr><td>1岁1月</td><td>13.7</td><td>14.7</td><td>15.7</td><td>17.0</td><td>18.4</td><td>20.1</td><td>22.1</td></tr>
+                <tr><td>1岁2月</td><td>13.6</td><td>14.6</td><td>15.6</td><td>16.8</td><td>18.3</td><td>19.9</td><td>21.9</td></tr>
+                <tr><td>1岁3月</td><td>13.5</td><td>14.5</td><td>15.5</td><td>16.7</td><td>18.1</td><td>19.7</td><td>21.7</td></tr>
+                <tr><td>1岁4月</td><td>13.5</td><td>14.4</td><td>15.4</td><td>16.6</td><td>18.0</td><td>19.6</td><td>21.5</td></tr>
+                <tr><td>1岁5月</td><td>13.4</td><td>14.3</td><td>15.3</td><td>16.5</td><td>17.8</td><td>19.4</td><td>21.4</td></tr>
+                <tr><td>1岁6月</td><td>13.3</td><td>14.2</td><td>15.2</td><td>16.4</td><td>17.7</td><td>19.3</td><td>21.2</td></tr>
+                <tr><td>1岁7月</td><td>13.3</td><td>14.1</td><td>15.1</td><td>16.3</td><td>17.6</td><td>19.2</td><td>21.1</td></tr>
+                <tr><td>1岁8月</td><td>13.2</td><td>14.1</td><td>15.0</td><td>16.2</td><td>17.5</td><td>19.1</td><td>21.0</td></tr>
+                <tr><td>1岁9月</td><td>13.2</td><td>14.0</td><td>15.0</td><td>16.1</td><td>17.4</td><td>19.0</td><td>20.9</td></tr>
+                <tr><td>1岁10月</td><td>13.1</td><td>13.9</td><td>14.9</td><td>16.0</td><td>17.3</td><td>18.9</td><td>20.8</td></tr>
+                <tr><td>1岁11月</td><td>13.0</td><td>13.9</td><td>14.8</td><td>15.9</td><td>17.2</td><td>18.8</td><td>20.7</td></tr>
+                <tr><td>2岁</td><td>13.2</td><td>14.0</td><td>15.0</td><td>16.1</td><td>17.4</td><td>19.0</td><td>20.9</td></tr>
+                <tr><td>2岁3月</td><td>13.1</td><td>13.9</td><td>14.8</td><td>15.9</td><td>17.2</td><td>18.8</td><td>20.7</td></tr>
+                <tr><td>2岁6月</td><td>12.9</td><td>13.7</td><td>14.7</td><td>15.8</td><td>17.0</td><td>18.6</td><td>20.4</td></tr>
+                <tr><td>2岁9月</td><td>12.9</td><td>13.6</td><td>14.6</td><td>15.6</td><td>16.9</td><td>18.4</td><td>20.3</td></tr>
+                <tr><td>3岁</td><td>12.8</td><td>13.6</td><td>14.5</td><td>15.5</td><td>16.8</td><td>18.3</td><td>20.1</td></tr>
+                <tr><td>3岁3月</td><td>12.7</td><td>13.5</td><td>14.4</td><td>15.4</td><td>16.7</td><td>18.2</td><td>20.1</td></tr>
+                <tr><td>3岁6月</td><td>12.7</td><td>13.4</td><td>14.3</td><td>15.4</td><td>16.6</td><td>18.1</td><td>20.0</td></tr>
+                <tr><td>3岁9月</td><td>12.6</td><td>13.4</td><td>14.3</td><td>15.3</td><td>16.6</td><td>18.1</td><td>20.0</td></tr>
+                <tr><td>4岁</td><td>12.6</td><td>13.3</td><td>14.2</td><td>15.3</td><td>16.6</td><td>18.1</td><td>20.1</td></tr>
+                <tr><td>4岁3月</td><td>12.5</td><td>13.3</td><td>14.2</td><td>15.3</td><td>16.6</td><td>18.2</td><td>20.2</td></tr>
+                <tr><td>4岁6月</td><td>12.5</td><td>13.3</td><td>14.2</td><td>15.3</td><td>16.6</td><td>18.2</td><td>20.3</td></tr>
+                <tr><td>4岁9月</td><td>12.4</td><td>13.2</td><td>14.1</td><td>15.3</td><td>16.6</td><td>18.3</td><td>20.5</td></tr>
+                <tr><td>5岁</td><td>12.4</td><td>13.2</td><td>14.1</td><td>15.3</td><td>16.7</td><td>18.4</td><td>20.7</td></tr>
+                <tr><td>5岁3月</td><td>12.3</td><td>13.1</td><td>14.1</td><td>15.3</td><td>16.7</td><td>18.6</td><td>21.0</td></tr>
+                <tr><td>5岁6月</td><td>12.3</td><td>13.1</td><td>14.1</td><td>15.3</td><td>16.8</td><td>18.7</td><td>21.4</td></tr>
+                <tr><td>5岁9月</td><td>12.2</td><td>13.1</td><td>14.1</td><td>15.3</td><td>16.9</td><td>18.9</td><td>21.7</td></tr>
+                <tr><td>6岁</td><td>12.2</td><td>13.1</td><td>14.1</td><td>15.4</td><td>17.0</td><td>19.1</td><td>22.1</td></tr>
+                <tr><td>6岁3月</td><td>12.2</td><td>13.0</td><td>14.1</td><td>15.4</td><td>17.1</td><td>19.3</td><td>22.5</td></tr>
+                <tr><td>6岁6月</td><td>12.1</td><td>13.0</td><td>14.1</td><td>15.4</td><td>17.2</td><td>19.5</td><td>22.9</td></tr>
+                <tr><td>6岁9月</td><td>12.1</td><td>13.0</td><td>14.1</td><td>15.4</td><td>17.2</td><td>19.7</td><td>23.3</td></tr>
+            </tbody>
+        </table>
+        <div class="note">
+            <strong>依据：</strong>《7岁以下儿童生长标准》（WS/T 423-2022），引自《体重管理指导原则（2024年版）》附表4
+            <br><strong>注：</strong>2岁以下适用于以体重和身长计算的BMI，2~7岁适用于以体重和身高计算的BMI。年龄为整月或整岁。
+        </div>
+    </div>
+
+    <!-- 5. 7岁以下女童月龄别BMI标准差表（依据PDF附表5） -->
+    <div class="official-table long-table">
+        <div class="table-caption">表5：7岁以下女童年龄别BMI的标准差数值（kg/m²） <span class="group-tag child">7岁以下女童</span></div>
+        <table id="girlBmiSdTable">
+            <thead>
+                <tr>
+                    <th>年龄</th>
+                    <th>-3 SD</th>
+                    <th>-2 SD</th>
+                    <th>-1 SD</th>
+                    <th>中位数</th>
+                    <th>+1 SD</th>
+                    <th>+2 SD</th>
+                    <th>+3 SD</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>0月</td><td>10.0</td><td>10.9</td><td>12.0</td><td>13.1</td><td>14.2</td><td>15.4</td><td>16.7</td></tr>
+                <tr><td>1月</td><td>11.7</td><td>12.6</td><td>13.5</td><td>14.7</td><td>15.9</td><td>17.3</td><td>18.9</td></tr>
+                <tr><td>2月</td><td>12.7</td><td>13.7</td><td>14.8</td><td>16.1</td><td>17.5</td><td>19.1</td><td>20.9</td></tr>
+                <tr><td>3月</td><td>13.2</td><td>14.3</td><td>15.4</td><td>16.7</td><td>18.3</td><td>20.0</td><td>22.0</td></tr>
+                <tr><td>4月</td><td>13.5</td><td>14.6</td><td>15.7</td><td>17.1</td><td>18.6</td><td>20.5</td><td>22.6</td></tr>
+                <tr><td>5月</td><td>13.7</td><td>14.7</td><td>15.9</td><td>17.3</td><td>18.8</td><td>20.7</td><td>22.9</td></tr>
+                <tr><td>6月</td><td>13.7</td><td>14.8</td><td>15.9</td><td>17.3</td><td>18.9</td><td>20.8</td><td>23.0</td></tr>
+                <tr><td>7月</td><td>13.7</td><td>14.8</td><td>15.9</td><td>17.3</td><td>18.9</td><td>20.7</td><td>22.9</td></tr>
+                <tr><td>8月</td><td>13.7</td><td>14.7</td><td>15.9</td><td>17.2</td><td>18.8</td><td>20.6</td><td>22.8</td></tr>
+                <tr><td>9月</td><td>13.7</td><td>14.6</td><td>15.8</td><td>17.1</td><td>18.6</td><td>20.4</td><td>22.5</td></tr>
+                <tr><td>10月</td><td>13.6</td><td>14.6</td><td>15.7</td><td>17.0</td><td>18.4</td><td>20.2</td><td>22.3</td></tr>
+                <tr><td>11月</td><td>13.5</td><td>14.5</td><td>15.6</td><td>16.8</td><td>18.3</td><td>20.0</td><td>22.0</td></tr>
+                <tr><td>1岁</td><td>13.4</td><td>14.4</td><td>15.4</td><td>16.7</td><td>18.1</td><td>19.8</td><td>21.8</td></tr>
+                <tr><td>1岁1月</td><td>13.4</td><td>14.3</td><td>15.3</td><td>16.5</td><td>17.9</td><td>19.6</td><td>21.6</td></tr>
+                <tr><td>1岁2月</td><td>13.3</td><td>14.2</td><td>15.2</td><td>16.4</td><td>17.8</td><td>19.4</td><td>21.3</td></tr>
+                <tr><td>1岁3月</td><td>13.2</td><td>14.1</td><td>15.1</td><td>16.3</td><td>17.6</td><td>19.2</td><td>21.1</td></tr>
+                <tr><td>1岁4月</td><td>13.1</td><td>14.0</td><td>15.0</td><td>16.2</td><td>17.5</td><td>19.1</td><td>21.0</td></tr>
+                <tr><td>1岁5月</td><td>13.1</td><td>13.9</td><td>14.9</td><td>16.0</td><td>17.4</td><td>18.9</td><td>20.8</td></tr>
+                <tr><td>1岁6月</td><td>13.0</td><td>13.8</td><td>14.8</td><td>15.9</td><td>17.3</td><td>18.8</td><td>20.7</td></tr>
+                <tr><td>1岁7月</td><td>12.9</td><td>13.8</td><td>14.7</td><td>15.9</td><td>17.2</td><td>18.7</td><td>20.5</td></tr>
+                <tr><td>1岁8月</td><td>12.9</td><td>13.7</td><td>14.7</td><td>15.8</td><td>17.1</td><td>18.6</td><td>20.4</td></tr>
+                <tr><td>1岁9月</td><td>12.8</td><td>13.7</td><td>14.6</td><td>15.7</td><td>17.0</td><td>18.5</td><td>20.3</td></tr>
+                <tr><td>1岁10月</td><td>12.8</td><td>13.6</td><td>14.5</td><td>15.6</td><td>16.9</td><td>18.4</td><td>20.2</td></tr>
+                <tr><td>1岁11月</td><td>12.7</td><td>13.5</td><td>14.5</td><td>15.6</td><td>16.8</td><td>18.3</td><td>20.1</td></tr>
+                <tr><td>2岁</td><td>12.9</td><td>13.7</td><td>14.7</td><td>15.8</td><td>17.0</td><td>18.6</td><td>20.4</td></tr>
+                <tr><td>2岁3月</td><td>12.8</td><td>13.6</td><td>14.5</td><td>15.6</td><td>16.9</td><td>18.4</td><td>20.2</td></tr>
+                <tr><td>2岁6月</td><td>12.6</td><td>13.5</td><td>14.4</td><td>15.5</td><td>16.7</td><td>18.2</td><td>20.1</td></tr>
+                <tr><td>2岁9月</td><td>12.6</td><td>13.4</td><td>14.3</td><td>15.4</td><td>16.6</td><td>18.1</td><td>20.0</td></tr>
+                <tr><td>3岁</td><td>12.5</td><td>13.3</td><td>14.2</td><td>15.3</td><td>16.5</td><td>18.1</td><td>19.9</td></tr>
+                <tr><td>3岁3月</td><td>12.4</td><td>13.2</td><td>14.1</td><td>15.2</td><td>16.5</td><td>18.0</td><td>19.9</td></tr>
+                <tr><td>3岁6月</td><td>12.4</td><td>13.2</td><td>14.1</td><td>15.2</td><td>16.5</td><td>18.0</td><td>19.9</td></tr>
+                <tr><td>3岁9月</td><td>12.3</td><td>13.1</td><td>14.0</td><td>15.1</td><td>16.4</td><td>18.0</td><td>20.0</td></tr>
+                <tr><td>4岁</td><td>12.2</td><td>13.0</td><td>14.0</td><td>15.1</td><td>16.4</td><td>18.0</td><td>20.0</td></tr>
+                <tr><td>4岁3月</td><td>12.2</td><td>13.0</td><td>13.9</td><td>15.0</td><td>16.4</td><td>18.0</td><td>20.1</td></tr>
+                <tr><td>4岁6月</td><td>12.1</td><td>12.9</td><td>13.9</td><td>15.0</td><td>16.4</td><td>18.1</td><td>20.2</td></tr>
+                <tr><td>4岁9月</td><td>12.1</td><td>12.9</td><td>13.9</td><td>15.0</td><td>16.4</td><td>18.1</td><td>20.3</td></tr>
+                <tr><td>5岁</td><td>12.0</td><td>12.9</td><td>13.8</td><td>15.0</td><td>16.4</td><td>18.2</td><td>20.5</td></tr>
+                <tr><td>5岁3月</td><td>12.0</td><td>12.8</td><td>13.8</td><td>15.0</td><td>16.4</td><td>18.3</td><td>20.6</td></tr>
+                <tr><td>5岁6月</td><td>11.9</td><td>12.8</td><td>13.8</td><td>15.0</td><td>16.5</td><td>18.4</td><td>20.8</td></tr>
+                <tr><td>5岁9月</td><td>11.9</td><td>12.8</td><td>13.8</td><td>15.0</td><td>16.5</td><td>18.4</td><td>21.0</td></tr>
+                <tr><td>6岁</td><td>11.9</td><td>12.7</td><td>13.8</td><td>15.0</td><td>16.6</td><td>18.5</td><td>21.2</td></tr>
+                <tr><td>6岁3月</td><td>11.9</td><td>12.7</td><td>13.8</td><td>15.0</td><td>16.6</td><td>18.6</td><td>21.4</td></tr>
+                <tr><td>6岁6月</td><td>11.8</td><td>12.7</td><td>13.8</td><td>15.0</td><td>16.6</td><td>18.7</td><td>21.5</td></tr>
+                <tr><td>6岁9月</td><td>11.8</td><td>12.7</td><td>13.8</td><td>15.0</td><td>16.7</td><td>18.8</td><td>21.7</td></tr>
+            </tbody>
+        </table>
+        <div class="note">
+            <strong>依据：</strong>《7岁以下儿童生长标准》（WS/T 423-2022），引自《体重管理指导原则（2024年版）》附表5
+            <br><strong>注：</strong>2岁以下适用于以体重和身长计算的BMI，2~7岁适用于以体重和身高计算的BMI。年龄为整月或整岁。
+        </div>
+    </div>
+
+    <!-- 6. 7~18岁儿童青少年BMI筛查标准（依据PDF附表6） -->
+    <div class="official-table" id="childAdolescentBmiTable">
+        <div class="table-caption">表6：7~18岁儿童青少年性别年龄别BMI筛查超重与肥胖界值 <span class="group-tag child">儿童青少年</span></div>
+        <table>
+            <thead>
+                <tr>
+                    <th rowspan="2">年龄（岁）</th>
+                    <th colspan="2">男生</th>
+                    <th colspan="2">女生</th>
+                </tr>
+                <tr>
+                    <th>超重界值</th>
+                    <th>肥胖界值</th>
+                    <th>超重界值</th>
+                    <th>肥胖界值</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>7.0 ~</td><td>17.0</td><td>18.7</td><td>16.8</td><td>18.5</td></tr>
+                <tr><td>7.5 ~</td><td>17.4</td><td>19.2</td><td>17.2</td><td>19.0</td></tr>
+                <tr><td>8.0 ~</td><td>17.8</td><td>19.7</td><td>17.6</td><td>19.4</td></tr>
+                <tr><td>8.5 ~</td><td>18.1</td><td>20.3</td><td>18.1</td><td>19.9</td></tr>
+                <tr><td>9.0 ~</td><td>18.5</td><td>20.8</td><td>18.5</td><td>20.4</td></tr>
+                <tr><td>9.5 ~</td><td>18.9</td><td>21.4</td><td>19.0</td><td>21.0</td></tr>
+                <tr><td>10.0 ~</td><td>19.2</td><td>21.9</td><td>19.5</td><td>21.5</td></tr>
+                <tr><td>10.5 ~</td><td>19.6</td><td>22.5</td><td>20.0</td><td>22.1</td></tr>
+                <tr><td>11.0 ~</td><td>19.9</td><td>23.0</td><td>20.5</td><td>22.7</td></tr>
+                <tr><td>11.5 ~</td><td>20.3</td><td>23.6</td><td>21.1</td><td>23.3</td></tr>
+                <tr><td>12.0 ~</td><td>20.7</td><td>24.1</td><td>21.5</td><td>23.9</td></tr>
+                <tr><td>12.5 ~</td><td>21.0</td><td>24.7</td><td>21.9</td><td>24.5</td></tr>
+                <tr><td>13.0 ~</td><td>21.4</td><td>25.2</td><td>22.2</td><td>25.0</td></tr>
+                <tr><td>13.5 ~</td><td>21.9</td><td>25.7</td><td>22.6</td><td>25.6</td></tr>
+                <tr><td>14.0 ~</td><td>22.3</td><td>26.1</td><td>22.8</td><td>25.9</td></tr>
+                <tr><td>14.5 ~</td><td>22.6</td><td>26.4</td><td>23.0</td><td>26.3</td></tr>
+                <tr><td>15.0 ~</td><td>22.9</td><td>26.6</td><td>23.2</td><td>26.6</td></tr>
+                <tr><td>15.5 ~</td><td>23.1</td><td>26.9</td><td>23.4</td><td>26.9</td></tr>
+                <tr><td>16.0 ~</td><td>23.3</td><td>27.1</td><td>23.6</td><td>27.1</td></tr>
+                <tr><td>16.5 ~</td><td>23.5</td><td>27.4</td><td>23.7</td><td>27.4</td></tr>
+                <tr><td>17.0 ~</td><td>23.7</td><td>27.6</td><td>23.8</td><td>27.6</td></tr>
+                <tr><td>17.5 ~</td><td>23.8</td><td>27.8</td><td>23.9</td><td>27.8</td></tr>
+                <tr><td>18.0 ~</td><td>24.0</td><td>28.0</td><td>24.0</td><td>28.0</td></tr>
+            </tbody>
+        </table>
+        <div class="note">
+            <strong>依据：</strong>《学龄儿童青少年超重与肥胖筛查》（WS/T 586-2018），引自《体重管理指导原则（2024年版）》附表6
+        </div>
+    </div>
+
+    <!-- 7. 妊娠期妇女体重增长标准（依据PDF附表7） -->
+    <div class="official-table">
+        <div class="table-caption">表7：妊娠期妇女体重增长范围及妊娠中、晚期每周体重增长推荐值 <span class="group-tag pregnant">孕妇</span></div>
+        <table>
+            <thead>
+                <tr>
+                    <th>妊娠前BMI分类</th>
+                    <th>总增长值范围（kg）</th>
+                    <th>妊娠早期增长值范围（kg）</th>
+                    <th>妊娠中、晚期每周体重增长值及范围（kg/周）</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>体重过低（&lt;18.5）</td><td>11.0 ~ 16.0</td><td>0 ~ 2.0</td><td>0.46（0.37~0.56）</td></tr>
+                <tr><td>体重正常（18.5~23.9）</td><td>8.0 ~ 14.0</td><td>0 ~ 2.0</td><td>0.37（0.26~0.48）</td></tr>
+                <tr><td>超重（24.0~27.9）</td><td>7.0 ~ 11.0</td><td>0 ~ 2.0</td><td>0.30（0.22~0.37）</td></tr>
+                <tr><td>肥胖（≥28.0）</td><td>5.0 ~ 9.0</td><td>0 ~ 2.0</td><td>0.22（0.15~0.30）</td></tr>
+            </tbody>
+        </table>
+        <div class="note">
+            <strong>依据：</strong>《妊娠期妇女体重增长推荐值标准》（WS/T 801-2022），引自《体重管理指导原则（2024年版）》附表7
+        </div>
+    </div>
+
+    <!-- 8. 老年人BMI适宜范围（依据PDF第2页） -->
+    <div class="official-table">
+        <div class="table-caption">表8：老年人BMI适宜范围 <span class="group-tag elderly">≥65岁老年人</span></div>
+        <table>
+            <thead>
+                <tr>
+                    <th>年龄组</th>
+                    <th>适宜BMI范围（kg/m²）</th>
+                    <th>健康建议</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>65~79岁</td><td>20.0 ~ 26.9（参考建议）</td><td>避免体重过低，降低营养不良、跌倒风险</td></tr>
+                <tr><td>≥80岁</td><td>22.0 ~ 26.9（依据《体重管理指导原则（2024年版）》）</td><td>适度偏高体重更利于维持肌肉量，减少疾病风险</td></tr>
+            </tbody>
+        </table>
+        <div class="note">
+            <strong>依据：</strong>《体重管理指导原则（2024年版）》第2页："对于80岁以上高龄老人，建议BMI适宜范围为22.0~26.9kg/m²"
+        </div>
+    </div>
+
+    <!-- 开源标识 -->
+    <div class="open-source">
+        <p>© 2026 liseezn | <a href="https://github.com/liseezn/bmi-calculator" target="_blank" style="color: #3498db; text-decoration: none;">GitHub仓库</a> | <a href="https://github.com/liseezn/bmi-calculator/blob/main/LICENSE" target="_blank" style="color: #3498db; text-decoration: none;">LGPL License</a> | 基于《体重管理指导原则(2024年版)》开发 | <a href="#calculator-form" style="color: #3498db; text-decoration: none;" onclick="goBackToCalculator()">返回计算器</a></p>
+    </div>
+    
+    <script>
+        /**
+         * 核心计算函数：整合BMI+体脂率+综合评估
+         * 严格按照《体重管理指导原则（2024年版）》PDF文档标准
+         */
+        function calculateAll(shareData = null) {
+            let birthDateInput, height, weight, waist, heightUnit, weightUnit, gender, specialGroup;
+            
+            if (shareData) {
+                // 从分享数据获取
+                birthDateInput = shareData.birthDate;
+                height = parseFloat(shareData.height);
+                weight = parseFloat(shareData.weight);
+                waist = parseFloat(shareData.waist);
+                heightUnit = shareData.heightUnit;
+                weightUnit = shareData.weightUnit;
+                gender = shareData.gender;
+                specialGroup = shareData.specialGroup;
+            } else {
+                // 从表单获取
+                birthDateInput = document.getElementById('birthDate').value;
+                if (!birthDateInput) {
+                    alert("请输入出生日期");
+                    return;
+                }
+                
+                height = parseFloat(document.getElementById('height').value);
+                weight = parseFloat(document.getElementById('weight').value);
+                waist = parseFloat(document.getElementById('waistCircumference').value);
+                
+                // 输入验证
+                if (isNaN(height) || height <= 0) {
+                    alert("请输入有效的身高值");
+                    return;
+                }
+                if (isNaN(weight) || weight <= 0) {
+                    alert("请输入有效的体重值");
+                    return;
+                }
+                if (isNaN(waist) || waist <= 0) {
+                    alert("请输入有效的腰围值");
+                    return;
+                }
+                
+                // 获取单位和人群参数
+                heightUnit = document.querySelector('input[name="heightUnit"]:checked').value;
+                weightUnit = document.querySelector('input[name="weightUnit"]:checked').value;
+                gender = document.querySelector('input[name="gender"]:checked').value;
+                specialGroup = document.querySelector('input[name="specialGroup"]:checked').value;
+            }
+            
+            const birthDate = new Date(birthDateInput);
+            const today = new Date();
+        
+            // 2. 单位转换
+            let heightM = height;
+            if (heightUnit === "cm") {
+                heightM = height / 100; // 厘米→米
+            }
+            let weightKg = weight;
+            if (weightUnit === "jin") {
+                weightKg = weight / 2; // 斤→千克（修正：1斤=0.5千克）
+            }
+        
+            // 3. 计算年龄（精确到月龄，用于7岁以下儿童SD值匹配）
+            const ageYears = today.getFullYear() - birthDate.getFullYear();
+            let ageMonths = today.getMonth() - birthDate.getMonth();
+            const ageDays = today.getDate() - birthDate.getDate();
+            
+            // 调整月龄
+            if (ageDays < 0) {
+                ageMonths--;
+            }
+            
+            const totalMonths = ageYears * 12 + ageMonths; // 总月龄
+            const age = Math.floor(totalMonths / 12); // 周岁年龄（向下取整）
+        
+            // 4. 计算BMI
+            if (heightM <= 0) {
+                alert("身高必须大于0");
+                return;
+            }
+            const bmiValue = weightKg / (heightM * heightM);
+            const bmi = bmiValue.toFixed(2);
+        
+            // 5. 分人群判定核心参数
+            let bmiStatus = "";
+            let bodyFatStatus = "";
+            let waistStatus = "";
+            let ageStage = "";
+            let referenceTable = "";
+            let healthAdvice = "";
+        
+            // 6. 特殊人群判定（孕妇优先）
+            if (specialGroup === "pregnant") {
+                ageStage = "妊娠期妇女（依据孕前BMI）";
+                referenceTable = "表7：妊娠期妇女体重增长范围";
+                
+                // BMI判定（依据PDF附表7）
+                if (bmiValue < 18.5) {
+                    bmiStatus = `体重过低（孕前BMI：${bmi}）`;
+                    healthAdvice = "推荐孕期总增重11.0~16.0kg，妊娠中晚期每周增重0.46kg（范围0.37~0.56kg）。需增加优质蛋白摄入，定期监测胎儿发育";
+                } else if (bmiValue < 24) {
+                    bmiStatus = `体重正常（孕前BMI：${bmi}）`;
+                    healthAdvice = "推荐孕期总增重8.0~14.0kg，妊娠中晚期每周增重0.37kg（范围0.26~0.48kg）。保持均衡饮食，每日增加300~450千卡能量";
+                } else if (bmiValue < 28) {
+                    bmiStatus = `超重（孕前BMI：${bmi}）`;
+                    healthAdvice = "推荐孕期总增重7.0~11.0kg，妊娠中晚期每周增重0.30kg（范围0.22~0.37kg）。控制精制糖、高脂食物，在医生指导下进行低强度运动";
+                } else {
+                    bmiStatus = `肥胖（孕前BMI：${bmi}）`;
+                    healthAdvice = "推荐孕期总增重5.0~9.0kg，妊娠中晚期每周增重0.22kg（范围0.15~0.30kg）。需严格遵循医疗膳食指导，避免体重过快增长，预防妊娠并发症";
+                }
+                
+                // 腰围和体脂率：孕妇不做常规判定
+                waistStatus = "孕期腰围增长为正常现象，参考孕期体重增长标准即可";
+                bodyFatStatus = "孕期体脂率无需刻意控制，以保障胎儿营养为主";
+            } 
+            // 7. 7岁以下儿童（依据PDF附表3、4、5）
+            else if (age < 7) {
+                ageStage = `幼儿（${age}岁${totalMonths % 12}月龄，<7岁）`;
+                referenceTable = `表${gender === "male" ? "4" : "5"}：7岁以下${gender === "male" ? "男童" : "女童"}年龄别BMI标准差表`;
+                
+                // 从HTML表格查询对应月龄的SD数据
+                const childBmiSd = getChildBmiSdByMonthFromTable(totalMonths, gender);
+                const childBmiStatus = getChildNutritionStatus(bmiValue, childBmiSd);
+                
+                bmiStatus = `BMI：${bmi} | 营养状况：${childBmiStatus}`;
+                
+                // 健康建议
+                if (childBmiStatus.includes("肥胖") || childBmiStatus.includes("超重")) {
+                    healthAdvice = "控制体重增长速度，每日户外活动≥180分钟（3~5岁中等强度≥60分钟），避免高糖零食，电子产品使用≤1小时/天，不建议节食减重";
+                } else if (childBmiStatus.includes("消瘦")) {
+                    healthAdvice = "排查消化吸收疾病，保证营养摄入（足量奶、蛋、瘦肉），培养规律饮食习惯，避免挑食偏食";
+                } else {
+                    healthAdvice = "保持均衡膳食，每日奶量500ml左右，增加户外自由活动，保证充足睡眠（2~5岁9~12小时/天）";
+                }
+                
+                waistStatus = "7岁以下儿童暂不推荐腰围判定，以BMI生长曲线为主";
+                bodyFatStatus = "儿童体脂率需专业仪器测量，家用估算准确性不足";
+            } 
+            // 8. 7~18岁儿童青少年（依据PDF附表6）
+            else if (age >= 7 && age < 18) {
+                ageStage = `儿童青少年（${age}岁）`;
+                referenceTable = "表6：7~18岁儿童青少年性别年龄别BMI筛查标准";
+                
+                // 从HTML表格查询对应年龄的超重/肥胖界值
+                const childBmiData = getChildBmiDataFromTable(age, gender);
+                const overThreshold = childBmiData.over;
+                const obeseThreshold = childBmiData.obese;
+                
+                if (bmiValue < overThreshold) {
+                    bmiStatus = `体重正常（BMI：${bmi}）`;
+                } else if (bmiValue < obeseThreshold) {
+                    bmiStatus = `超重（BMI：${bmi}）`;
+                } else {
+                    bmiStatus = `肥胖（BMI：${bmi}）`;
+                }
+                
+                // 健康建议
+                if (bmiStatus.includes("肥胖")) {
+                    healthAdvice = "每日运动≥90分钟（含60分钟中等强度运动），限制含糖饮料和油炸食品，电子产品≤2小时/天，保证睡眠8~10小时/天，不建议快速减重";
+                } else if (bmiStatus.includes("超重")) {
+                    healthAdvice = "每日运动≥60分钟，减少课间久坐，替换高糖零食为水果/坚果，规律三餐，避免睡前加餐";
+                } else {
+                    healthAdvice = "保持每日60分钟中等强度运动（跑步、球类），保证优质蛋白摄入（瘦肉、豆制品），限制含糖饮料，维持规律作息";
+                }
+                
+                bodyFatStatus = "儿童青少年体脂率无统一家用判定标准，建议结合BMI+运动情况综合评估";
+                
+                // 腰围简单判定
+                waistStatus = `腰围：${waist.toFixed(1)}cm（参考值）`;
+            } 
+            // 9. 18~64岁成人（依据PDF附表1、2）
+            else if (age >= 18 && age < 65) {
+                ageStage = `成年人（${age}岁）`;
+                referenceTable = "表1：中国成人BMI判定标准 + 表2：成人中心型肥胖分类";
+                
+                // BMI判定（依据PDF附表1）
+                if (bmiValue < 18.5) {
+                    bmiStatus = `体重过低（BMI：${bmi}）`;
+                    healthAdvice = "增加高能量、高蛋白食物（坚果、全脂奶、瘦肉），排查胃肠道疾病，每周3次抗阻运动增加瘦体重";
+                } else if (bmiValue < 24) {
+                    bmiStatus = `体重正常（BMI：${bmi}）`;
+                    healthAdvice = "保持每周150分钟中等强度运动（快走、游泳），饮食均衡（粗细搭配、多蔬菜），减少高盐食物，控制腰围";
+                } else if (bmiValue < 28) {
+                    bmiStatus = `超重（BMI：${bmi}）`;
+                    healthAdvice = "每日减少500千卡能量摄入，每周3次有氧运动（每次40分钟）+2次抗阻训练，每月监测BMI和腰围";
+                } else {
+                    bmiStatus = `肥胖（BMI：${bmi}）`;
+                    healthAdvice = "建议就诊营养科制定个性化减重计划，结合饮食控制+规律运动，必要时医学评估药物干预可行性";
+                }
+                
+                // 腰围判定（依据PDF附表2）
+                if (gender === "male") {
+                    if (waist < 85) {
+                        waistStatus = `腰围：${waist.toFixed(1)}cm（正常）`;
+                    } else if (waist < 90) {
+                        waistStatus = `腰围：${waist.toFixed(1)}cm（中心型肥胖前期）`;
+                    } else {
+                        waistStatus = `腰围：${waist.toFixed(1)}cm（中心型肥胖）`;
+                    }
+                } else {
+                    if (waist < 80) {
+                        waistStatus = `腰围：${waist.toFixed(1)}cm（正常）`;
+                    } else if (waist < 85) {
+                        waistStatus = `腰围：${waist.toFixed(1)}cm（中心型肥胖前期）`;
+                    } else {
+                        waistStatus = `腰围：${waist.toFixed(1)}cm（中心型肥胖）`;
+                    }
+                }
+                
+                // 体脂率简单估算
+                if (age >= 18) {
+                    let bodyFatRate = 0;
+                    if (gender === "male") {
+                        bodyFatRate = (1.20 * bmiValue) + (0.23 * age) - 16.2;
+                    } else {
+                        bodyFatRate = (1.20 * bmiValue) + (0.23 * age) - 5.4;
+                    }
+                    bodyFatRate = Math.max(0, bodyFatRate).toFixed(1);
+                    bodyFatStatus = `估算体脂率：${bodyFatRate}%（仅供参考）`;
+                }
+            } 
+            // 10. ≥65岁老年人（依据PDF第2页）
+            else {
+                ageStage = `老年人（${age}岁）`;
+                referenceTable = "表8：老年人BMI适宜范围";
+                
+                // BMI判定
+                if (age >= 80) {
+                    if (bmiValue < 22.0) {
+                        bmiStatus = `体重过低（BMI：${bmi}）`;
+                        healthAdvice = "增加易消化蛋白质（鸡蛋、鱼肉、豆腐），预防跌倒，定期监测骨密度，每日轻度活动30分钟";
+                    } else if (bmiValue < 27.0) {
+                        bmiStatus = `体重适宜（BMI：${bmi}）`;
+                        healthAdvice = "保持每日30分钟轻度运动，饮食清淡易消化，保证蔬菜水果摄入，午睡≤1小时";
+                    } else {
+                        bmiStatus = `超重（BMI：${bmi}）`;
+                        healthAdvice = "避免高脂、高糖食物，在专业指导下进行温和运动（如慢走、哑铃操），监测血压血糖";
+                    }
+                } else {
+                    if (bmiValue < 20.0) {
+                        bmiStatus = `体重过低（BMI：${bmi}）`;
+                        healthAdvice = "增加易消化蛋白质（鸡蛋、鱼肉、豆腐），预防跌倒，定期监测骨密度，每日轻度活动30分钟";
+                    } else if (bmiValue < 27.0) {
+                        bmiStatus = `体重适宜（BMI：${bmi}）`;
+                        healthAdvice = "保持每日30分钟轻度运动，饮食清淡易消化，保证蔬菜水果摄入，午睡≤1小时";
+                    } else {
+                        bmiStatus = `超重（BMI：${bmi}）`;
+                        healthAdvice = "避免高脂、高糖食物，在专业指导下进行温和运动（如慢走、哑铃操），监测血压血糖";
+                    }
+                }
+                
+                waistStatus = `腰围：${waist.toFixed(1)}cm（参考值）`;
+                bodyFatStatus = "老年人体脂率参考成人标准，建议略宽松，重点关注肌肉量";
+            }
+        
+            // 11. 格式化显示原始输入值
+            const showHeight = heightUnit === "cm" ? `${height.toFixed(1)} 厘米` : `${heightM.toFixed(2)} 米`;
+            const showWeight = weightUnit === "jin" ? `${weight.toFixed(1)} 斤` : `${weightKg.toFixed(1)} 千克`;
+        
+            // 12. 输出结果到结果页面
+            const resultContent = `
+                <div class="result-box">
+                    <h4>综合评估结果</h4>
+                    <p><strong>1. 基础信息</strong></p>
+                    <p>年龄阶段：<span>${ageStage}</span></p>
+                    <p>身高：<span>${showHeight}</span> | 体重：<span>${showWeight}</span></p>
+                    <p>腰围：<span>${waist.toFixed(1)} 厘米</span> | 性别：<span>${gender === 'male' ? '男' : '女'}</span></p>
+                    <p>特殊人群：<span>${specialGroup === 'pregnant' ? '孕妇' : '普通人群'}</span></p>
+                    
+                    <p><strong>2. BMI 评估</strong></p>
+                    <p>BMI 值：<span>${bmi} kg/m²</span></p>
+                    <p>体质状态：<span>${bmiStatus}</span></p>
+                    
+                    <p><strong>3. 中心型肥胖评估</strong></p>
+                    <p>${waistStatus}</p>
+                    
+                    <p><strong>4. 体脂率估算</strong></p>
+                    <p>${bodyFatStatus}</p>
+                    
+                    <p><strong>5. 健康建议</strong></p>
+                    <p>${healthAdvice}</p>
+                    
+                    <p><strong>6. 参考标准</strong></p>
+                    <p>${referenceTable}</p>
+                    
+                    ${generateShareLink(birthDateInput, height, weight, waist, heightUnit, weightUnit, gender, specialGroup)}
+                    
+                    <div class="note">
+                        <strong>温馨提示：</strong>本结果基于《体重管理指导原则（2024年版）》标准计算，仅供健康参考。实际健康状况需结合体脂率、腰围、肌肉量、病史等综合评估，如有健康问题请咨询专业医疗人员。
+                    </div>
+                </div>
+            `;
+            
+            // 显示结果页面
+            document.getElementById('result-content').innerHTML = resultContent;
+            document.getElementById('calculator-form').classList.add('hidden');
+            document.getElementById('result-page').classList.remove('hidden');
+            
+            // 更新URL分享链接
+            updateShareUrl(birthDateInput, height, weight, waist, heightUnit, weightUnit, gender, specialGroup);
+        }
+        
+        /**
+         * 生成分享链接HTML
+         */
+        function generateShareLink(birthDate, height, weight, waist, heightUnit, weightUnit, gender, specialGroup) {
+            // 生成当前页面的分享链接
+            const shareUrl = window.location.origin + window.location.pathname + '#share=' + 
+                encodeURIComponent(JSON.stringify({
+                    birthDate: birthDate,
+                    height: height,
+                    weight: weight,
+                    waist: waist,
+                    heightUnit: heightUnit,
+                    weightUnit: weightUnit,
+                    gender: gender,
+                    specialGroup: specialGroup
+                }));
+            
+            return `
+                <div class="share-link">
+                    <p><strong>分享链接：</strong></p>
+                    <input type="text" id="shareUrl" value="${shareUrl}" readonly>
+                    <button class="copy-btn" onclick="copyShareLink()">复制链接</button>
+                    <p style="font-size:12px; margin-top:5px;">复制此链接可分享计算结果</p>
+                </div>
+            `;
+        }
+        
+        /**
+         * 更新浏览器URL分享链接
+         */
+        function updateShareUrl(birthDate, height, weight, waist, heightUnit, weightUnit, gender, specialGroup) {
+            const shareData = {
+                birthDate: birthDate,
+                height: height,
+                weight: weight,
+                waist: waist,
+                heightUnit: heightUnit,
+                weightUnit: weightUnit,
+                gender: gender,
+                specialGroup: specialGroup
+            };
+            
+            // 更新URL hash
+            window.location.hash = 'share=' + encodeURIComponent(JSON.stringify(shareData));
+        }
+        
+        /**
+         * 复制分享链接
+         */
+        function copyShareLink() {
+            const shareUrlInput = document.getElementById('shareUrl');
+            if (shareUrlInput) {
+                shareUrlInput.select();
+                document.execCommand('copy');
+                alert('链接已复制到剪贴板！');
+            }
+        }
+        
+        /**
+         * 返回计算器
+         */
+        function goBackToCalculator() {
+            document.getElementById('result-page').classList.add('hidden');
+            document.getElementById('calculator-form').classList.remove('hidden');
+            // 清空URL hash
+            window.location.hash = '';
+        }
+        
+        /**
+         * 辅助函数：从HTML表6查询对应年龄的超重/肥胖界值
+         */
+        function getChildBmiDataFromTable(age, gender) {
+            const table = document.getElementById('childAdolescentBmiTable').querySelector('table');
+            const rows = table.querySelectorAll('tbody tr');
+            let overThreshold = 0;
+            let obeseThreshold = 0;
+            
+            // 年龄列索引：0，男性超重：1，男性肥胖：2，女性超重：3，女性肥胖：4
+            const ageColIndex = 0;
+            const maleOverCol = 1;
+            const maleObeseCol = 2;
+            const femaleOverCol = 3;
+            const femaleObeseCol = 4;
+            
+            // 遍历表格行，匹配最接近的年龄（向下匹配）
+            rows.forEach(row => {
+                const ageText = row.cells[ageColIndex].textContent.trim();
+                const ageRange = parseFloat(ageText.split('~')[0]);
+                if (ageRange <= age) {
+                    overThreshold = gender === "male" ? 
+                        parseFloat(row.cells[maleOverCol].textContent) : 
+                        parseFloat(row.cells[femaleOverCol].textContent);
+                    obeseThreshold = gender === "male" ? 
+                        parseFloat(row.cells[maleObeseCol].textContent) : 
+                        parseFloat(row.cells[femaleObeseCol].textContent);
+                }
+            });
+            
+            return { over: overThreshold, obese: obeseThreshold };
+        }
+        
+        /**
+         * 辅助函数：从儿童SD表查询对应月龄的SD值
+         */
+        function getChildBmiSdByMonthFromTable(totalMonths, gender) {
+            const tableId = gender === "male" ? "boyBmiSdTable" : "girlBmiSdTable";
+            const table = document.getElementById(tableId);
+            const rows = table.querySelectorAll('tbody tr');
+            
+            // 表格列索引：月龄0，-3SD1，-2SD2，-1SD3，中位数4，+1SD5，+2SD6，+3SD7
+            const monthColIndex = 0;
+            const sd3nCol = 1;
+            const sd2nCol = 2;
+            const sd1nCol = 3;
+            const medianCol = 4;
+            const sd1pCol = 5;
+            const sd2pCol = 6;
+            const sd3pCol = 7;
+            
+            let matchedData = {
+                sd3n: 0, sd2n: 0, sd1n: 0, median: 0, plus1SD: 0, plus2SD: 0, plus3SD: 0
+            };
+            
+            // 遍历表格行，匹配最接近的月龄（向下匹配）
+            rows.forEach(row => {
+                const monthText = row.cells[monthColIndex].textContent.trim();
+                let month = 0;
+                
+                // 解析月龄文本
+                if (monthText.includes("岁")) {
+                    const years = parseInt(monthText.split("岁")[0]);
+                    let months = 0;
+                    if (monthText.includes("月")) {
+                        months = parseInt(monthText.split("岁")[1].split("月")[0]);
+                    }
+                    month = years * 12 + months;
+                } else if (monthText.includes("月")) {
+                    month = parseInt(monthText.split("月")[0]);
+                } else {
+                    month = parseInt(monthText);
+                }
+                
+                if (month <= totalMonths) {
+                    matchedData = {
+                        sd3n: parseFloat(row.cells[sd3nCol].textContent),
+                        sd2n: parseFloat(row.cells[sd2nCol].textContent),
+                        sd1n: parseFloat(row.cells[sd1nCol].textContent),
+                        median: parseFloat(row.cells[medianCol].textContent),
+                        plus1SD: parseFloat(row.cells[sd1pCol].textContent),
+                        plus2SD: parseFloat(row.cells[sd2pCol].textContent),
+                        plus3SD: parseFloat(row.cells[sd3pCol].textContent)
+                    };
+                }
+            });
+            
+            return matchedData;
+        }
+        
+        /**
+         * 辅助函数：根据BMI值和SD数据判定7岁以下儿童营养状况
+         * 依据：《7岁以下儿童生长标准》（WS/T 423-2022）附表3
+         */
+        function getChildNutritionStatus(bmiValue, sdData) {
+            if (bmiValue >= sdData.plus3SD) return "重度肥胖";
+            if (bmiValue >= sdData.plus2SD) return "肥胖";
+            if (bmiValue >= sdData.plus1SD) return "超重";
+            if (bmiValue >= sdData.sd2n) return "正常";
+            if (bmiValue >= sdData.sd3n) return "消瘦";
+            return "重度消瘦";
+        }
+        
+        /**
+         * 页面加载时检查分享链接
+         */
+        function checkShareLink() {
+            if (window.location.hash) {
+                const hash = window.location.hash.substring(1);
+                if (hash.startsWith('share=')) {
+                    try {
+                        const shareDataStr = decodeURIComponent(hash.substring(6));
+                        const shareData = JSON.parse(shareDataStr);
+                        
+                        // 使用分享数据计算
+                        calculateAll(shareData);
+                        return true;
+                    } catch (e) {
+                        console.error('分享链接解析失败:', e);
+                    }
+                }
+            }
+            return false;
+        }
+        
+        /**
+         * 页面加载时初始化
+         */
+        window.onload = function() {
+            // 设置默认出生日期（30岁）
+            const today = new Date();
+            const defaultBirthDate = new Date(today.getFullYear() - 30, today.getMonth(), today.getDate());
+            document.getElementById('birthDate').valueAsDate = defaultBirthDate;
+            
+            // 检查是否有分享链接
+            const hasShareLink = checkShareLink();
+            
+            if (!hasShareLink) {
+                // 如果没有分享链接，显示计算器表单
+                document.getElementById('calculator-form').classList.remove('hidden');
+                document.getElementById('result-page').classList.add('hidden');
+            }
+        };
+    </script>
+</body>
+</html>
